@@ -1,21 +1,19 @@
 void serialEvent() 
   {
-    while (Serial.available()) 
+    while(Serial2.available()) 
       {
-        uint8_t data = (uint8_t)Serial.read();
-        if(data == 120)
+        uint8_t data = (uint8_t)Serial2.read();
+        //SerialBT.print("Data From Arduino = ");
+        //SerialBT.println(data);
+        if(data == 'x')
           {
-            Serial.print(door_Array_Status);
+            Serial2.write(door_Array_Status);
+            SerialBT.print("Sending Door Array Status = ");
+            SerialBT.println(door_Array_Status);
           }
-        else if(data == 121)
+        else if(data == 'y')
           {
-            Serial.print('@');
-            Serial.print(delays[0]);
-            Serial.print('$');
-            Serial.print(delays[1]);
-            Serial.print('%');
-            Serial.print(delays[2]);
-            Serial.print('#');
+            SendDelays();          
           }
         else
           {
@@ -28,6 +26,9 @@ void serialEvent()
               door_Array_Status = 0;
              else
               door_Array_Status = data;
+            Serial2.write(door_Array_Status);
+            SerialBT.print("Current Door Array Status = ");
+            SerialBT.println(door_Array_Status);
           }
       }
   }
@@ -36,26 +37,29 @@ void serialBTEvent()
   {
     if(SerialBT.available())
       {
-        uint8_t data = (uint8_t)SerialBT.read();
-        if(data == 102)
+        char data = (char)SerialBT.read();
+        if(data == 'z')
           {
-            Serial.print(data);
-            uint8_t count = 0;
+            //uint8_t count = 0;
             String inputString = "";
             while(SerialBT.available() == 0);
             while(SerialBT.available()) 
               {
-                data = (uint8_t)SerialBT.read();
-                Serial.print(data);
+                data = (char)SerialBT.read();
                 inputString = inputString + data;
                 if(data == '#')
                   break;                
               }
+            //inputString = inputString + '\n';
+            SerialBT.print("Input String = ");
+            SerialBT.println(inputString);            
             delays[0] = inputString.substring(inputString.lastIndexOf('@')+1, inputString.lastIndexOf('$')).toInt();
             delays[1] = inputString.substring(inputString.lastIndexOf('$')+1, inputString.lastIndexOf('%')).toInt();
             delays[2] = inputString.substring(inputString.lastIndexOf('%')+1, inputString.lastIndexOf('#')).toInt();
             prefs.putBool("saved", true);
             prefs.putBytes("delays", delays, sizeof(delays));
+            SerialBT.print("Delays has been updated...");
+            SendDelays();
           }
       }
     while (SerialBT.available()) 
@@ -63,10 +67,52 @@ void serialBTEvent()
         uint8_t data = (uint8_t)SerialBT.read();
       }
   }
+  
+/*
+void serialBTEvent() 
+  {
+    if(SerialBT.available())
+      {
+        uint8_t data = (uint8_t)SerialBT.read();
+        if(data == 'z')
+          {
+            while(SerialBT.available() == 0);
+            delays[0] = (uint8_t)SerialBT.read() - 48;
+            while(SerialBT.available() == 0);
+            delays[1] = (uint8_t)SerialBT.read() - 48;
+            while(SerialBT.available() == 0);
+            delays[2] = (uint8_t)SerialBT.read() - 48;
+            prefs.putBool("saved", true);
+            prefs.putBytes("delays", delays, sizeof(delays));
+            SerialBT.println("Delays Changed...!");
+            SendDelays();    
+          }
+      }
+    while (SerialBT.available()) 
+      {
+        uint8_t data = (uint8_t)SerialBT.read();
+      }
+  }
+*/
+
+void SendDelays()
+  {
+    Serial2.print('z');
+    Serial2.write(delays[0]);
+    Serial2.write(delays[1]);
+    Serial2.write(delays[2]);
+
+    SerialBT.println("Sending Delays...");
+    SerialBT.print('z');
+    SerialBT.print(delays[0]);
+    SerialBT.print(delays[1]);
+    SerialBT.print(delays[2]);
+    SerialBT.println();
+  }
 
 void initNode()
   {
-    node.begin(1, Serial2);
+    node.begin(1, Serial);
     node.preTransmission(preTrans);
     node.postTransmission(postTrans);
   }
@@ -88,7 +134,7 @@ void node_Read()
       if(fire != 0 || emergency != 0)
         {
           uint8_t command = 101;
-          Serial.print(command);
+          Serial2.write(command);
           door_Array_Status = 101;
           for(uint8_t i = 0; i < 8; i++)
             doors_Status[i] = 3;
@@ -158,9 +204,10 @@ void GetDoorsData()
       
     for(board = 0; board <= boards_Connected; board++)
       {
-        Serial.print(board);
-        while(Serial.available() == 0);        
-        boardStatus = (uint8_t)Serial.read();
+        uint8_t req = board * 10 + 5;
+        Serial2.write(req);
+        while(Serial2.available() == 0);        
+        boardStatus = (uint8_t)Serial2.read();
         uint8_t res = boardStatus & (0x01);
         if(res != 0)
           d1_Switch = 1;

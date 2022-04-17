@@ -1,12 +1,8 @@
 void InitBoard()
   {
     Serial.begin(9600);
-    
-    pinMode(adr_1, INPUT);
-    pinMode(adr_2, INPUT);
-    pinMode(adr_3, INPUT);
-    pinMode(adr_4, INPUT);
-    
+    //Serial.println("Hello World...!");
+        
     pinMode(d1_FB_1, INPUT);
     pinMode(d1_FB_2, INPUT);
     pinMode(d1_Switch, INPUT);
@@ -34,30 +30,34 @@ void InitBoard()
     digitalWrite(d2_Buzzer, LOW);
 
     GetBoardID();
+    delay(1000);
     GetDelays();
+    delay(1000);
   }
 
 void GetBoardID()
   {
-    if(digitalRead(adr_1) == HIGH)
+    if(analogRead(adr_1) > 768)
       board_ID = board_ID | (0x01);
     else
       board_ID = board_ID & ~(0x01);
 
-    if(digitalRead(adr_2) == HIGH)
+    if(analogRead(adr_2) > 768)
       board_ID = board_ID | (0x02);
     else
       board_ID = board_ID & ~(0x02);
 
-    if(digitalRead(adr_3) == HIGH)
+    if(analogRead(adr_3) > 768)
       board_ID = board_ID | (0x04);
     else
       board_ID = board_ID & ~(0x04);
 
-    if(digitalRead(adr_4) == HIGH)
+    if(analogRead(adr_4) > 768)
       board_ID = board_ID | (0x08);
     else
       board_ID = board_ID & ~(0x08);
 
     board_ID = board_ID * 10;
+    //Serial.print("Bord ID = ");
+    //Serial.print(board_ID);
   }

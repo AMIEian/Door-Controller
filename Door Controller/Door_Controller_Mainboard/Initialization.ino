@@ -2,8 +2,10 @@ void InitBoard()
   {
     Serial.begin(9600);
     Serial2.begin(9600, SERIAL_8N1, RXD2, TXD2);
-    SerialBT.begin("Poly_1"); //Bluetooth device name
+    SerialBT.begin("Door"); //Bluetooth device name
+    
     prefs.begin("delays"); // use "calibrations" namespace
+    //prefs.clear();
     bool saved = prefs.getBool("saved");
     if(saved == true)
       prefs.getBytes("delays", delays, sizeof(delays));
@@ -51,4 +53,7 @@ void GetBoards()
       boards_Connected = boards_Connected | (0x08);
     else
       boards_Connected = boards_Connected & ~(0x08);
+
+    SerialBT.print("Total Boards Connected = ");
+    SerialBT.println(boards_Connected);
   }

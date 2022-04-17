@@ -42,7 +42,23 @@ uint16_t door_Open_Delay = 20000;
 
 void setup()
   {
+    delay(random(1000, 5000));
     InitBoard();
+    /*
+    for(int i=0; i<5; i++)
+    {
+      digitalWrite(d1_Red_LED, HIGH);
+      digitalWrite(d1_Green_LED, HIGH);
+      digitalWrite(d2_Red_LED, HIGH);
+      digitalWrite(d2_Green_LED, HIGH);
+      delay(1000);
+      digitalWrite(d1_Red_LED, LOW);
+      digitalWrite(d1_Green_LED, LOW);
+      digitalWrite(d2_Red_LED, LOW);
+      digitalWrite(d2_Green_LED, LOW);
+      delay(1000);
+    }
+    */
     CheckDoorsStatus();
     if(d1_Status == 1)
       {
@@ -50,6 +66,7 @@ void setup()
         digitalWrite(d1_Red_LED, HIGH);
         digitalWrite(d1_Green_LED, LOW);
         digitalWrite(d1_Buzzer, HIGH);
+        //Serial.println("Door 1 Open...");
       }
     else
       {
@@ -57,6 +74,7 @@ void setup()
         digitalWrite(d1_Red_LED, LOW);
         digitalWrite(d1_Green_LED, HIGH);
         digitalWrite(d1_Buzzer, LOW);
+        //Serial.println("Door 1 Closed...");
       }
     if(d2_Status == 2)
       {
@@ -64,6 +82,7 @@ void setup()
         digitalWrite(d2_Red_LED, HIGH);
         digitalWrite(d2_Green_LED, LOW);
         digitalWrite(d2_Buzzer, HIGH);
+        //Serial.println("Door 2 Open...");
       }
     else
       {
@@ -71,6 +90,7 @@ void setup()
         digitalWrite(d2_Red_LED, LOW);
         digitalWrite(d2_Green_LED, HIGH);
         digitalWrite(d2_Buzzer, LOW);
+        //Serial.println("Door 2 Closed...");
       }
     UpdateBoardStatus();
     GetDoorArrayStatus();
@@ -81,11 +101,12 @@ void loop()
     CheckHandSwitches();
     if(d1_Switch_Status || d2_Switch_Status)
       {
+        //Serial.println("Hand Switch Pressed...");
         GetDoorArrayStatus();
         if(door_Array_Status == 0)
           {
             if(d1_Switch_Status)
-              {
+              {                
                 DoorLogicControl(door_1);
               }
             if(d2_Switch_Status)
@@ -93,5 +114,19 @@ void loop()
                 DoorLogicControl(door_2);
               }
           }
+      }
+    if(door_Array_Status != 0)
+      {
+        digitalWrite(d1_Red_LED, HIGH);
+        digitalWrite(d1_Green_LED, LOW);
+        digitalWrite(d2_Red_LED, HIGH);
+        digitalWrite(d2_Green_LED, LOW);
+      }
+    else
+      {
+        digitalWrite(d1_Red_LED, LOW);
+        digitalWrite(d1_Green_LED, HIGH);
+        digitalWrite(d2_Red_LED, LOW);
+        digitalWrite(d2_Green_LED, HIGH);
       }
   }

@@ -52,7 +52,7 @@ void postTrans()
 void setup()
   {
     InitBoard();
-    initNode();
+    //initNode();
   }
 
 void loop() 
@@ -61,10 +61,9 @@ void loop()
     serialEvent();
     serialBTEvent();
     digitalWrite(comLED, LOW);
-    CheckEmergency();
     digitalWrite(modbusLED, HIGH);
-    node_Read();
-    node_Write();
+    //node_Read();
+    //node_Write();
     digitalWrite(modbusLED, LOW);
     delay(10);
     currentmillis = millis();   //Get current millis
@@ -76,5 +75,8 @@ void loop()
         
             // control LED arccoding to the toggled state
             digitalWrite(beatLED, ledState);
+            CheckEmergency();
+            //SerialBT.print("Current Door Array Status = ");
+            //SerialBT.println(door_Array_Status);
         }
   }
