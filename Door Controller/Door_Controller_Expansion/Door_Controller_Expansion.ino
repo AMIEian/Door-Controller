@@ -34,15 +34,19 @@ uint8_t emergency_Status = 0;
 
 bool d1_Switch_Status = false;
 bool d2_Switch_Status = false;
+bool d1_Switch_Closed = false;
+bool d2_Switch_Closed = false;
 
 uint16_t delays[3] = {2, 5, 20};
 uint16_t switch_Delay = 2000;
 uint16_t door_Opening_Delay = 5000;
 uint16_t door_Open_Delay = 20000;
 
+uint16_t timer = 0;
+
 void setup()
   {
-    delay(random(1000, 5000));
+    delay(random(5000, 10000));
     InitBoard();
     /*
     for(int i=0; i<5; i++)

@@ -10,7 +10,17 @@ void GetDoorArrayStatus()
   {
     //uint8_t command = 120;
     Serial.print('x');
-    while(Serial.available() == 0);
+    timer = 1000;
+    while(Serial.available() == 0 && timer > 0)
+      {
+        timer = timer - 10;
+        delay(10);
+      }
+    if(timer == 0)
+      {
+        door_Array_Status = 1;
+        return;
+      }
     door_Array_Status = (uint8_t)Serial.read();
     //Serial.print("Door status received = ");
     //Serial.println(door_Array_Status);
@@ -19,13 +29,22 @@ void GetDoorArrayStatus()
 void GetDelays()
   {
     Serial.print('y');
-    while(Serial.available() == 0);
+    timer = 1000;
+    while(Serial.available() == 0 && timer > 0)
+      {
+        timer = timer - 10;
+        delay(10);
+      }
+    if(timer == 0)
+      {
+        return;
+      }
     char startFlag = (uint8_t)Serial.read();
-    while(Serial.available() == 0);
+    //while(Serial.available() == 0);
     delays[0] = (uint8_t)Serial.read();
-    while(Serial.available() == 0);
+    //while(Serial.available() == 0);
     delays[1] = (uint8_t)Serial.read();
-    while(Serial.available() == 0);
+    //while(Serial.available() == 0);
     delays[2] = (uint8_t)Serial.read();
     switch_Delay = delays[0] * 1000;
     door_Opening_Delay = delays[1] * 1000;
@@ -85,6 +104,18 @@ void serialEvent()
             SendBoardStatus();
           }
         else
-          door_Array_Status = data;
+          {
+            uint8_t board = 0;
+            uint8_t door = 0;
+            board = data / 10;
+            door = data % 10;            
+            if(door == 5)
+              return;
+            else
+              {
+                if(data < 90)
+                  door_Array_Status = data;                
+              }              
+          }
       }
   }
