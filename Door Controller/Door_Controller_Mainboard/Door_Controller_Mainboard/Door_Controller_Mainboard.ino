@@ -52,7 +52,7 @@ BluetoothSerial SerialBT;
 Preferences prefs;
 
 uint8_t slaveID = 1;
-Modbus slave(1,Serial,0); // this is slave @1 and RS-232 or USB-FTDI
+Modbus slave(1,Serial,MAX485_DE); // this is slave @1 and RS-232 or USB-FTDI
 
 void setup()
   {    
